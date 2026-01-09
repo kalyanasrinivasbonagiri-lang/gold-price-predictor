@@ -1,100 +1,134 @@
-# 🏆 Gold Price Predictor Using Polynomial Regression
+# 💰 Gold Price Predictor
 
-<div align="center">
+> An intelligent machine learning application that forecasts gold prices using Polynomial Regression with real-time currency conversion
 
-![Gold Price Predictor](https://img.shields.io/badge/Gold-Price%20Predictor-FFD700?style=for-the-badge&logo=bitcoin&logoColor=white)
-![Python](https://img.shields.io/badge/Python-3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![Flask](https://img.shields.io/badge/Flask-2.0+-000000?style=for-the-badge&logo=flask&logoColor=white)
-![ML](https://img.shields.io/badge/Machine%20Learning-Polynomial%20Regression-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white)
-
-**AI-powered gold price forecasting with real-time USD to INR conversion**
-
-[Features](#-features) • [Demo](#-demo) • [Installation](#-installation) • [Usage](#-usage) • [API](#-api-integration) • [Model](#-model-details)
-
-</div>
+[![Python](https://img.shields.io/badge/python-v3.8+-blue.svg)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/flask-v2.0+-green.svg)](https://flask.palletsprojects.com/)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Status](https://img.shields.io/badge/status-active-success.svg)]()
 
 ---
 
-## 📋 Overview
+## 📖 Table of Contents
 
-Gold Price Predictor is an intelligent web application that leverages **Polynomial Regression (degree 3)** machine learning to forecast future gold prices. Built with Flask and scikit-learn, it provides accurate predictions with automatic USD to INR conversion using live exchange rates.
-
-### 🎯 Key Highlights
-
-- 🔮 **AI-Powered Predictions** - Polynomial regression model trained on historical data
-- 💱 **Real-time Currency Conversion** - Live USD to INR rates via API
-- 📊 **Interactive Dashboard** - Beautiful dark-themed UI with animations
-- 📈 **Trend Visualization** - Historical price charts with matplotlib
-- 📜 **Prediction History** - Track and compare all your forecasts
-- ⚖️ **Year Comparison** - Analyze gold price changes across years
-- 📱 **Responsive Design** - Works seamlessly on mobile and desktop
-
----
-
-## ✨ Features
-
-### 🔮 Price Prediction
-- Select any future date to get predicted gold prices
-- Automatic calculation breakdown showing:
-  - Original USD price per ounce
-  - After 6% import duty
-  - After 3% GST
-  - Final INR price per gram and per 10 grams
-
-### 📊 Analytics Dashboard
-- **Model Metrics Display**: R-squared, MSE, and RMSE values
-- **Historical Trends**: Interactive charts showing price movements over time
-- **Year-over-Year Comparison**: Compare average prices between any two years
-- **Prediction History**: Session-based tracking of all predictions with timestamps
-
-### 💰 Currency Integration
-- Live USD to INR exchange rates from [open.er-api.com](https://open.er-api.com)
-- 1-hour caching to optimize API calls
-- Fallback rate (₹83.0) for API failures
-- Automatic conversion per troy ounce to grams
-
-### 🎨 User Interface
-- Modern dark theme with gold accents
-- Smooth animations and hover effects
-- Mobile-responsive with slide-out navigation
-- Real-time embedded gold price widget from dpgold.com
+- [About](#about)
+- [Features](#features)
+- [Demo](#demo)
+- [Getting Started](#getting-started)
+- [Technology Stack](#technology-stack)
+- [How It Works](#how-it-works)
+- [Project Structure](#project-structure)
+- [API Reference](#api-reference)
+- [Deployment](#deployment)
+- [Screenshots](#screenshots)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
+- [License](#license)
+- [Contact](#contact)
 
 ---
 
-## 🚀 Demo
+## 🎯 About
 
-### Dashboard Preview
+**Gold Price Predictor** is a full-stack web application that leverages machine learning to predict future gold prices. Using historical price data from 2010 onwards, the application trains a Polynomial Regression model to forecast prices and automatically converts them to Indian Rupees (INR) using live exchange rates.
+
+### Why This Project?
+
+- **Educational Tool**: Learn about ML model deployment and web development
+- **Real-world Application**: Understand gold price trends and patterns
+- **Technical Showcase**: Demonstrates integration of ML, Flask, and external APIs
+
+---
+
+## ⚡ Features
+
+<table>
+<tr>
+<td>
+
+### Core Functionality
+- 🤖 **ML-Powered Predictions** using Polynomial Regression (degree 3)
+- 💱 **Live Currency Conversion** with USD to INR API
+- 📊 **Interactive Visualizations** using Matplotlib
+- 🕐 **Session-based History** tracking
+- 📈 **Trend Analysis** and year comparisons
+
+</td>
+<td>
+
+### User Experience
+- 🎨 **Modern Dark Theme** with gold accents
+- 📱 **Fully Responsive** mobile and desktop layout
+- ⚡ **Real-time Updates** with smooth animations
+- 🔄 **Embedded Live Widget** from dpgold.com
+- 🧮 **Detailed Breakdown** of price calculations
+
+</td>
+</tr>
+</table>
+
+---
+
+## 🎬 Demo
+
+### Live Prediction Flow
+
+```mermaid
+graph LR
+    A[Select Future Date] --> B[Submit Prediction]
+    B --> C[Model Calculates USD Price]
+    C --> D[Fetch Live USD/INR Rate]
+    D --> E[Calculate INR Price]
+    E --> F[Display Results + Chart]
+    F --> G[Save to History]
 ```
-┌─────────────────────────────────────────────────┐
-│  🏆 Gold Analytics AI Predictor                 │
-├─────────────────────────────────────────────────┤
-│  📊 Metrics                                     │
-│  • R-Squared: 0.95  • MSE: 234.56  • RMSE: 15.3│
-├─────────────────────────────────────────────────┤
-│  🔮 Make a Prediction                           │
-│  Select Date: [2026-06-15] [Predict Price]     │
-│                                                 │
-│  Predicted Gold Price: $2,450.00               │
-│  ₹ Final Price: ₹6,892.45 per gram             │
-└─────────────────────────────────────────────────┘
+
+### Sample Output
+
+**Input**: Predict price for `2026-12-31`
+
+**Output**:
+```
+Predicted Gold Price: $2,487.50 USD
+
+Price Breakdown:
+├─ Original Price (per ounce): $2,487.50
+├─ After 6% Import Duty: ₹6,845.23
+├─ After 3% GST: ₹7,050.59
+├─ Final Price (per gram): ₹7,050.59
+└─ Final Price (per 10 grams): ₹70,505.90
+
+Model Metrics:
+• R-Squared: 0.95
+• MSE: 234.56
+• RMSE: 15.32
 ```
 
 ---
 
-## 🛠️ Installation
+## 🚀 Getting Started
 
 ### Prerequisites
-- Python 3.8 or higher
-- pip (Python package manager)
-- Git
 
-### Step 1: Clone the Repository
+Ensure you have the following installed:
+
+```bash
+Python 3.8+
+pip
+Git
+```
+
+### Installation
+
+**1. Clone the repository**
+
 ```bash
 git clone https://github.com/yourusername/gold-price-predictor.git
 cd gold-price-predictor
 ```
 
-### Step 2: Create Virtual Environment
+**2. Create and activate virtual environment**
+
 ```bash
 # Windows
 python -m venv venv
@@ -105,289 +139,413 @@ python3 -m venv venv
 source venv/bin/activate
 ```
 
-### Step 3: Install Dependencies
+**3. Install dependencies**
+
 ```bash
 pip install -r requirements.txt
 ```
 
-### Step 4: Prepare the Dataset
-Ensure `GOLD_prices_2010_to_today.csv` is in the root directory with columns:
-- `Date` (YYYY-MM-DD format)
-- `Close` (USD price)
+**4. Verify dataset**
 
-### Step 5: Run the Application
+Ensure `GOLD_prices_2010_to_today.csv` exists with these columns:
+- `Date` - Format: YYYY-MM-DD
+- `Close` - Gold closing price in USD
+
+**5. Run the application**
+
 ```bash
 python app.py
 ```
 
-Visit `http://localhost:5000` in your browser.
+**6. Access the application**
 
----
-
-## 📦 Dependencies
-
-```txt
-flask==2.3.0
-pandas==2.0.0
-numpy==1.24.0
-scikit-learn==1.2.2
-matplotlib==3.7.1
-requests==2.31.0
-werkzeug==2.3.0
+Open your browser and navigate to:
 ```
-
-Create a `requirements.txt` file with the above content.
-
----
-
-## 📁 Project Structure
-
-```
-gold-price-predictor/
-│
-├── app.py                          # Main Flask application
-├── GOLD_prices_2010_to_today.csv  # Historical gold price dataset
-├── gold_price_model.pkl           # Trained ML model (auto-generated)
-├── requirements.txt               # Python dependencies
-│
-├── templates/
-│   └── index_dashboard.html       # Main dashboard template
-│
-├── static/                        # (Optional) Static assets
-│
-└── README.md                      # Project documentation
+http://localhost:5000
 ```
 
 ---
 
-## 🎓 Model Details
+## 🛠️ Technology Stack
 
-### Algorithm: Polynomial Regression (Degree 3)
+### Backend
+![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-000000?style=flat&logo=flask&logoColor=white)
+![Pandas](https://img.shields.io/badge/Pandas-150458?style=flat&logo=pandas&logoColor=white)
+![NumPy](https://img.shields.io/badge/NumPy-013243?style=flat&logo=numpy&logoColor=white)
+![scikit-learn](https://img.shields.io/badge/scikit--learn-F7931E?style=flat&logo=scikit-learn&logoColor=white)
+
+### Frontend
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)
+
+### Visualization
+![Matplotlib](https://img.shields.io/badge/Matplotlib-11557c?style=flat&logo=python&logoColor=white)
+
+### External APIs
+- **Exchange Rate API**: [open.er-api.com](https://open.er-api.com)
+- **Live Gold Widget**: [dpgold.com](https://www.dpgold.com)
+
+---
+
+## 🧠 How It Works
+
+### 1. Data Processing Pipeline
+
+```python
+# Load historical data
+df = pd.read_csv('GOLD_prices_2010_to_today.csv')
+
+# Clean and prepare
+df['Date'] = pd.to_datetime(df['Date'])
+df['Days'] = (df['Date'] - df['Date'].min()).dt.days
+
+# Split data
+train_size = int(0.8 * len(df))
+X_train, y_train = df['Days'][:train_size], df['Close'][:train_size]
+```
+
+### 2. Model Training
 
 ```python
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import make_pipeline
 
-model = make_pipeline(PolynomialFeatures(3), LinearRegression())
+# Create polynomial regression model
+model = make_pipeline(
+    PolynomialFeatures(degree=3),
+    LinearRegression()
+)
+
+# Train the model
+model.fit(X_train, y_train)
+
+# Save model
+pickle.dump(model, open('gold_price_model.pkl', 'wb'))
 ```
 
-### Training Process
-1. **Data Loading**: Historical gold prices from 2010 to present
-2. **Feature Engineering**: Days since earliest date as predictor variable
-3. **Train-Test Split**: 80% training, 20% validation
-4. **Model Training**: Polynomial features transformed, then linear regression
-5. **Model Persistence**: Saved as `gold_price_model.pkl` using pickle
+### 3. Prediction Process
 
-### Prediction Formula
+**Mathematical Formula**:
 ```
-y = β₀ + β₁x + β₂x² + β₃x³
-```
-Where `x` = days since the earliest date in the dataset
+Price(t) = β₀ + β₁t + β₂t² + β₃t³
 
-### Model Evaluation
-- **R-Squared (R²)**: Measures goodness of fit
-- **MSE (Mean Squared Error)**: Average squared prediction error
-- **RMSE (Root Mean Squared Error)**: Standard deviation of residuals
+Where:
+t = days since earliest date
+β₀, β₁, β₂, β₃ = learned coefficients
+```
+
+### 4. Currency Conversion
+
+```python
+# Fetch live USD to INR rate
+usd_to_inr_rate = get_usd_to_inr()  # e.g., 83.5
+
+# Convert from troy ounce to grams and apply charges
+price_per_gram = (usd_price * usd_to_inr_rate) / 31.103
+with_import_duty = price_per_gram * 1.06  # 6% import duty
+final_price = with_import_duty * 1.03      # 3% GST
+```
 
 ---
 
-## 🌐 API Integration
+## 📂 Project Structure
 
-### USD to INR Exchange Rate API
+```
+gold-price-predictor/
+│
+├── 📄 app.py                          # Flask application (main entry point)
+├── 📊 GOLD_prices_2010_to_today.csv   # Historical gold price dataset
+├── 🤖 gold_price_model.pkl            # Trained ML model (auto-generated)
+├── 📋 requirements.txt                # Python dependencies
+├── 📖 README.md                       # Documentation (this file)
+│
+├── 📁 templates/
+│   └── index_dashboard.html           # Main dashboard UI
+│
+├── 📁 .mpl_config/                    # Matplotlib config (auto-generated)
+│
+└── 📁 static/                         # (Optional) CSS, JS, images
+```
 
-**Endpoint**: `https://open.er-api.com/v6/latest/USD`
+### Key Files Explained
 
-**Features**:
-- Free tier with no authentication required
-- Hourly rate limiting
-- 1-hour cache implementation
-- Automatic fallback to ₹83.0
+| File | Purpose |
+|------|---------|
+| `app.py` | Flask routes, model training, API integration |
+| `index_dashboard.html` | Responsive dashboard with dark theme UI |
+| `GOLD_prices_2010_to_today.csv` | Training data with Date and Close columns |
+| `gold_price_model.pkl` | Serialized trained model for predictions |
+
+---
+
+## 🔌 API Reference
+
+### External API: USD to INR Exchange Rate
+
+**Endpoint**: 
+```
+GET https://open.er-api.com/v6/latest/USD
+```
+
+**Response Sample**:
+```json
+{
+  "result": "success",
+  "time_last_update_utc": "Sun, 05 Jan 2026 00:00:01 +0000",
+  "rates": {
+    "INR": 83.45,
+    "EUR": 0.85,
+    ...
+  }
+}
+```
 
 **Implementation**:
 ```python
 def get_usd_to_inr():
-    # Check cache (1-hour validity)
-    if cache_is_valid():
+    # Cache for 1 hour
+    if cache_valid():
         return cached_rate
     
-    # Fetch live rate
-    response = requests.get("https://open.er-api.com/v6/latest/USD")
+    # Fetch from API
+    response = requests.get("https://open.er-api.com/v6/latest/USD", timeout=5)
     rate = response.json()["rates"]["INR"]
     
     # Update cache
-    cache_rate(rate)
+    cache_update(rate)
     return rate
 ```
 
----
+### Application Routes
 
-## 💡 Usage Guide
-
-### Making Predictions
-
-1. **Navigate to Predict Page**
-   - Click "🔮 Predict" in the sidebar
-
-2. **Select Future Date**
-   - Choose any date after today
-   - Click "Predict Price"
-
-3. **View Results**
-   - USD price prediction
-   - Detailed INR calculation breakdown
-   - Updated price chart
-
-### Viewing History
-
-1. **Access History Page**
-   - Click "📜 History" in sidebar
-
-2. **Review Predictions**
-   - See all predictions with timestamps
-   - USD and INR prices displayed
-   - Clear history option available
-
-### Comparing Years
-
-1. **Navigate to Compare**
-   - Click "⚖ Compare" in sidebar
-
-2. **Select Years**
-   - Choose two years from dropdowns
-   - Click "Compare Years"
-
-3. **Analyze Results**
-   - Average price per year
-   - Price difference calculation
+| Route | Method | Description |
+|-------|--------|-------------|
+| `/` | GET, POST | Main prediction page |
+| `/history` | GET | View prediction history |
+| `/trends` | GET | Display price trends chart |
+| `/compare` | GET, POST | Compare prices between years |
+| `/about` | GET | Model information |
+| `/clear_history` | POST | Clear session history |
+| `/usd_to_inr` | GET | Get current exchange rate (JSON) |
 
 ---
 
-## 🔧 Configuration
+## 🌐 Deployment
 
-### Adjusting Conversion Rates
+### Deploy on Render.com
 
-Edit the calculation in `app.py`:
+**Step 1**: Create `render.yaml`
 
-```python
-def calculate_inr_price(usd_price):
-    usd_to_inr = (usd_price * get_usd_to_inr()) / 31.103  # Troy ounce to grams
-    usd_to_inr_with_6_percent = usd_to_inr * 1.06        # Import duty
-    final_price_in_inr = usd_to_inr_with_6_percent * 1.03 # GST
-    final_price_in_inr_for_10grams = final_price_in_inr * 10
-    
-    return {
-        'inr_price': final_price_in_inr,
-        'inr_price_for_10grams': final_price_in_inr_for_10grams
-    }
-```
-
-### Changing Model Degree
-
-Modify the polynomial degree in `train_model()`:
-
-```python
-model = make_pipeline(PolynomialFeatures(3), LinearRegression())  # Change 3 to desired degree
-```
-
----
-
-## 🚀 Deployment
-
-### Deploy on Render
-
-1. Create `render.yaml`:
 ```yaml
 services:
   - type: web
-    name: gold-predictor
+    name: gold-price-predictor
     env: python
+    region: singapore
+    plan: free
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.9.0
 ```
 
-2. Add `gunicorn` to requirements:
+**Step 2**: Add Gunicorn to requirements
+
 ```bash
 echo "gunicorn==20.1.0" >> requirements.txt
 ```
 
-3. Push to GitHub and connect to Render
+**Step 3**: Deploy
+
+1. Push code to GitHub
+2. Connect repository to Render
+3. Deploy automatically
 
 ### Deploy on Heroku
 
-1. Create `Procfile`:
+**Step 1**: Create `Procfile`
+
 ```
 web: gunicorn app:app
 ```
 
-2. Deploy:
+**Step 2**: Deploy
+
 ```bash
+# Login to Heroku
+heroku login
+
+# Create app
 heroku create gold-price-predictor
+
+# Deploy
 git push heroku main
+
+# Open app
+heroku open
 ```
+
+### Deploy on PythonAnywhere
+
+1. Upload files to PythonAnywhere
+2. Create virtual environment
+3. Configure WSGI file
+4. Set working directory
+5. Reload application
 
 ---
 
-## ⚠️ Disclaimer
+## 📸 Screenshots
 
-**This application is for educational and demonstration purposes only.**
+### Main Dashboard
+```
+┌──────────────────────────────────────────────────────────────┐
+│  🏆 Gold Analytics AI Predictor                              │
+├──────────────────────────────────────────────────────────────┤
+│  Metrics:   R²: 0.95  |  MSE: 234.56  |  RMSE: 15.32        │
+├──────────────────────────────────────────────────────────────┤
+│  🔮 Make a Prediction                                        │
+│  ┌────────────────┐  ┌──────────────┐                       │
+│  │ Date: 2026-12-31│  │ Predict Price │                      │
+│  └────────────────┘  └──────────────┘                       │
+│                                                              │
+│  ╔══════════════════════════════════════╗                   │
+│  ║  Predicted Gold Price: $2,487.50    ║                   │
+│  ║  Final INR Price: ₹70,505.90 /10g  ║                   │
+│  ╚══════════════════════════════════════╝                   │
+│                                                              │
+│  📊 [Interactive Price Chart]                               │
+└──────────────────────────────────────────────────────────────┘
+```
 
-- Predictions are based on historical patterns and statistical modeling
-- NOT intended for financial advice or investment decisions
-- Gold prices are influenced by numerous real-world factors not captured by this model
-- Always consult financial professionals for investment guidance
+*(Add actual screenshots here)*
+
+---
+
+## 🗺️ Roadmap
+
+### Version 2.0 (Planned)
+
+- [ ] Add LSTM neural network model
+- [ ] Implement user authentication
+- [ ] Database integration (PostgreSQL)
+- [ ] Email notifications for price alerts
+- [ ] Export predictions to PDF/Excel
+- [ ] Multi-currency support (EUR, GBP, etc.)
+- [ ] Historical data auto-update feature
+- [ ] Mobile app (React Native)
+
+### Future Enhancements
+
+- [ ] Sentiment analysis from news articles
+- [ ] Integration with stock market APIs
+- [ ] Comparison with other precious metals
+- [ ] Advanced statistical analysis tools
+- [ ] REST API for third-party integration
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! Here's how you can help:
+Contributions make the open-source community an amazing place to learn and create. Any contributions you make are **greatly appreciated**.
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+### How to Contribute
 
-### Contribution Ideas
-- Add more ML models (LSTM, ARIMA, Prophet)
-- Implement user authentication
-- Add database persistence
-- Include more financial metrics
-- Multi-currency support
+1. **Fork the Project**
+2. **Create your Feature Branch**
+   ```bash
+   git checkout -b feature/AmazingFeature
+   ```
+3. **Commit your Changes**
+   ```bash
+   git commit -m 'Add some AmazingFeature'
+   ```
+4. **Push to the Branch**
+   ```bash
+   git push origin feature/AmazingFeature
+   ```
+5. **Open a Pull Request**
+
+### Contribution Guidelines
+
+- Write clear commit messages
+- Follow PEP 8 style guide for Python
+- Add comments for complex logic
+- Update documentation as needed
+- Test thoroughly before submitting
 
 ---
 
-## 📝 License
+## ⚠️ Important Disclaimer
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+```
+┌─────────────────────────────────────────────────────────────┐
+│  ⚠️  EDUCATIONAL PURPOSE ONLY                               │
+├─────────────────────────────────────────────────────────────┤
+│  This application is a demonstration project and should     │
+│  NOT be used for actual financial decisions or investment.  │
+│                                                             │
+│  • Predictions are based on historical patterns only        │
+│  • Does not account for market events or economic factors   │
+│  • Not financial advice - consult professionals             │
+│  • Past performance ≠ future results                        │
+└─────────────────────────────────────────────────────────────┘
+```
 
 ---
 
-## 👨‍💻 Author
+## 📄 License
+
+Distributed under the MIT License. See `LICENSE` file for more information.
+
+```
+MIT License
+
+Copyright (c) 2026 Your Name
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files...
+```
+
+---
+
+## 👤 Contact
 
 **Your Name**
 
-- GitHub: [@kalyanasrinivasbonagiri]([https://github.com/kalyanasrinivasbonagiri](https://github.com/kalyanasrinivasbonagiri-lang))
-- LinkedIn: [kalyanasrinivasbonagiri](www.linkedin.com/in/kalyanasrinivas-bonagiri-a33709322)
-- Email: kalyanasrinivasbonagiri@gmaail.com
+- 🌐 Portfolio: [yourwebsite.com](https://yourwebsite.com)
+- 💼 LinkedIn: [kalyanasrinivasbonagiri](www.linkedin.com/in/kalyanasrinivas-bonagiri-a33709322)
+- 📧 Email: kalyanasrinivasbonagiri@gmail.com
+- 🐙 GitHub: [@kalyanasrinivasbonagiri-lang]([https://github.com/yourusername](https://github.com/kalyanasrinivasbonagiri-lang))
+
+**Project Link**: [https://github.com/yourusername/gold-price-predictor](https://github.com/yourusername/gold-price-predictor)
 
 ---
 
 ## 🙏 Acknowledgments
 
-- Historical gold price data from [source]
-- Exchange rate API by [open.er-api.com](https://open.er-api.com)
-- Scikit-learn for machine learning capabilities
-- Flask framework for web application
-- Live gold price widget by [dpgold.com](https://www.dpgold.com)
+Special thanks to:
+
+* [Scikit-learn](https://scikit-learn.org/) - Machine learning library
+* [Flask](https://flask.palletsprojects.com/) - Web framework
+* [Pandas](https://pandas.pydata.org/) - Data manipulation
+* [Matplotlib](https://matplotlib.org/) - Visualization
+* [open.er-api.com](https://open.er-api.com) - Exchange rate API
+* [dpgold.com](https://www.dpgold.com) - Live gold price widget
+* All contributors who helped improve this project
 
 ---
 
 <div align="center">
 
-**⭐ Star this repository if you find it helpful!**
+### ⭐ Star this repo if you found it helpful!
 
-Made with ❤️ and 🐍 Python
+**Made with ❤️ using Python and Machine Learning**
+
+[⬆ Back to Top](#-gold-price-predictor)
 
 </div>
