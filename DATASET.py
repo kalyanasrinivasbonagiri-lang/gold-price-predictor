@@ -2,6 +2,7 @@ import yfinance as yf  # type: ignore
 import pandas as pd  # type: ignore
 import os
 from datetime import timedelta
+import time
 
 # ================= CONFIG =================
 TICKER = "GC=F"
@@ -63,6 +64,7 @@ def update_dataset():
     """
     Appends ONLY new data to existing CSV.
     Never deletes old data.
+    Includes proper error handling for yfinance issues.
     """
     if os.path.exists(CSV_FILE):
         print("Existing dataset found.")
@@ -79,26 +81,56 @@ def update_dataset():
 
     print(f"Fetching data from {start_fetch_date.date()} to today...")
 
-    df_new = yf.download(
-        TICKER,
-        start=start_fetch_date.strftime("%Y-%m-%d"),
-        progress=False
-    )
-
-    if df_new.empty:
-        print("No new data available. Dataset already up-to-date.")
-        return
-
-    df_new.reset_index(inplace=True)
-
-    # Append safely
-    df_combined = pd.concat([df_existing, df_new], ignore_index=True)
-
-    # Final clean & save
-    df_combined.to_csv(CSV_FILE, index=False)
-    clean_and_lock_schema(CSV_FILE)
-
-    print("Dataset updated successfully (data appended safely).")
+    # Retry logic for rate limiting
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            df_new = yf.download(
+                TICKER,
+                start=start_fetch_date.strftime("%Y-%m-%d"),
+                progress=False
+            )
+            
+            if df_new.empty:
+                print("No new data available. Dataset already up-to-date.")
+                return
+            
+            # Handle MultiIndex columns if present
+            if isinstance(df_new.columns, pd.MultiIndex):
+                df_new.columns = df_new.columns.get_level_values(0)
+            
+            # Reset index to make Date a column
+            df_new.reset_index(inplace=True)
+            
+            # Clean column names and select required ones
+            df_new.columns = df_new.columns.str.strip()
+            df_new = df_new[['Date', 'Open', 'High', 'Low', 'Close', 'Volume']].copy()
+            
+            # Append safely
+            df_combined = pd.concat([df_existing, df_new], ignore_index=True)
+            df_combined = df_combined.drop_duplicates(subset=['Date'], keep='last')
+            df_combined = df_combined.sort_values('Date').reset_index(drop=True)
+            
+            # Save
+            df_combined.to_csv(CSV_FILE, index=False)
+            
+            print(f"✅ Dataset updated successfully! Added {len(df_new)} new records")
+            print(f"   Latest date: {df_combined['Date'].max().date()}")
+            return
+                
+        except Exception as e:
+            if "429" in str(e) or "Too Many Requests" in str(e):
+                wait_time = (attempt + 1) * 30
+                print(f"Rate limited (HTTP 429). Waiting {wait_time} seconds... (Attempt {attempt + 1}/{max_retries})")
+                time.sleep(wait_time)
+            else:
+                print(f"Error on attempt {attempt + 1}: {type(e).__name__}: {e}")
+                if attempt == max_retries - 1:
+                    print("Failed to fetch data after retries.")
+                    return
+                time.sleep(5)
+    
+    print("Update complete.")
 
 
 if __name__ == "__main__":
