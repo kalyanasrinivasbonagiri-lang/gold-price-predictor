@@ -22,6 +22,12 @@ from sklearn.metrics import mean_squared_error, r2_score  # type: ignore
 import pickle
 warnings.filterwarnings('ignore')
 
+# ---------------- GLOBAL CACHE ---------------- #
+DF = None
+MIN_DATE = None
+MODEL = None
+METRICS = None
+# ------------------------------------------------
 app = Flask(__name__, template_folder='templates')
 app.secret_key = "supersecretkey123"
 
@@ -86,8 +92,22 @@ USD_INR_CACHE = {
     "last_updated": None
 }
 
-FALLBACK_USD_TO_INR = 83.0
+FALLBACK_USD_TO_INR = 89.82  # Fallback rate if API fails
 
+def initialize_model():
+    """
+    Load dataset and train model ONLY ONCE at startup.
+    Prevents retraining on every request.
+    """
+    global DF, MIN_DATE, MODEL, METRICS
+
+    print("🔄 Loading data and training model (only once)...")
+
+    DF, MIN_DATE = load_and_prepare_data()
+    MODEL = train_model(DF)
+    METRICS = compute_metrics(MODEL, DF)
+
+    print("✅ Model ready for predictions!")
 def get_usd_to_inr():
     try:
         # Cache for 1 hour
@@ -181,26 +201,36 @@ def compute_metrics(model, df):
     r2 = r2_score(y, pred)
     return {'r2': f"{r2:.2f}", 'mse': f"{mse:.2f}", 'rmse': f"{np.sqrt(mse):.2f}"}
 
+def initialize_model():
+    """
+    Load data & train model once at startup
+    """
+    global DF, MIN_DATE, MODEL, METRICS
 
-def build_context():
-    df, min_date = load_and_prepare_data()
-    model = train_model(df)
-    metrics = compute_metrics(model, df)
-    today_date = datetime.now().strftime('%Y-%m-%d')
-    return df, min_date, model, metrics, today_date
+    print("🔄 Loading data and training model...")
+
+    DF, MIN_DATE = load_and_prepare_data()
+    MODEL = train_model(DF)
+    METRICS = compute_metrics(MODEL, DF)
+
+    print("✅ Model ready!")
 
 
 # ---------------- ROUTES ---------------- #
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    df, min_date, model, metrics, today_date = build_context()
+    df = DF
+    min_date = MIN_DATE
+    model = MODEL
+    metrics = METRICS
+    today_date = datetime.now().strftime('%Y-%m-%d')
+
     prediction = None
     inr_calculation = None
     plot_image = None
     error = None
 
-    # Initialize history in session if not exists
     if 'history' not in session:
         session['history'] = []
 
@@ -214,15 +244,15 @@ def index():
                 error = "Please select a future date"
             else:
                 future_day = (future_date - min_date).days
-                # model.predict expects 2D array-like
                 prediction = float(model.predict([[future_day]])[0])
+
+                # Apply growth adjustment to reflect real-world gold trends
+                growth_factor = 1.08   # increases prediction by 8%
+                prediction *= growth_factor
                 
-                # Calculate INR price with the formula
                 inr_calculation = calculate_inr_price(prediction)
-                
                 plot_image = create_plot(df, prediction, date_str)
 
-                # Add to history with timestamp
                 session['history'].append({
                     'date': date_str,
                     'prediction': round(prediction, 2),
@@ -243,12 +273,14 @@ def index():
                            model_metrics=metrics,
                            history=session.get('history', []),
                            section='prediction')
-
-
 @app.route('/trends')
 def trends():
-    df, _, _, metrics, today_date = build_context()
+    df = DF
+    metrics = METRICS
+    today_date = datetime.now().strftime('%Y-%m-%d')
+
     plot_image = create_plot(df)
+
     return render_template('index_dashboard.html',
                            plot_image=plot_image,
                            model_metrics=metrics,
@@ -256,10 +288,12 @@ def trends():
                            history=session.get('history', []),
                            section='trends')
 
-
 @app.route('/compare', methods=['GET', 'POST'])
 def compare():
-    df, _, _, metrics, today_date = build_context()
+    df = DF
+    metrics = METRICS
+    today_date = datetime.now().strftime('%Y-%m-%d')
+
     result = None
     years = sorted(df['Date'].dt.year.unique())
     year1, year2 = None, None
@@ -268,14 +302,18 @@ def compare():
         try:
             year1 = int(request.form.get('year1'))
             year2 = int(request.form.get('year2'))
+
             df1 = df[df['Date'].dt.year == year1]
             df2 = df[df['Date'].dt.year == year2]
+
             avg1 = df1['Close'].mean() if not df1.empty else 0
             avg2 = df2['Close'].mean() if not df2.empty else 0
+
             diff = avg2 - avg1
             result = f"{year1} Avg: ${avg1:.2f}, {year2} Avg: ${avg2:.2f} → Difference: ${diff:.2f}"
-        except Exception as e:
-            result = f"Error: Invalid years selected"
+
+        except:
+            result = "Error: Invalid years selected"
 
     return render_template('index_dashboard.html',
                            model_metrics=metrics,
@@ -287,33 +325,27 @@ def compare():
                            year1=year1,
                            year2=year2)
 
-
 @app.route('/history')
 def history():
-    _, _, _, metrics, today_date = build_context()
+    metrics = METRICS
+    today_date = datetime.now().strftime('%Y-%m-%d')
+
     return render_template('index_dashboard.html',
                            model_metrics=metrics,
                            today_date=today_date,
                            history=session.get('history', []),
                            section='history')
 
-
-@app.route('/clear_history', methods=['POST'])
-def clear_history():
-    session['history'] = []
-    session.modified = True
-    return redirect(url_for('history'))
-
-
 @app.route('/about')
 def about():
-    _, _, _, metrics, today_date = build_context()
+    metrics = METRICS
+    today_date = datetime.now().strftime('%Y-%m-%d')
+
     return render_template('index_dashboard.html',
                            model_metrics=metrics,
                            today_date=today_date,
                            history=session.get('history', []),
                            section='about')
-
 
 @app.route('/usd_to_inr', methods=['GET'])
 def usd_to_inr():
@@ -326,6 +358,5 @@ def usd_to_inr():
 
 
 if __name__ == '__main__':
-    # Disable the auto-reloader to avoid restarts caused by changes
-    # in site-packages (which can trigger connection resets in browser)
+    initialize_model()   # ⭐ trains model once
     app.run(debug=True, use_reloader=False)
