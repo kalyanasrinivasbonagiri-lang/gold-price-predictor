@@ -65,18 +65,37 @@ def load_and_prepare_data():
 def train_model(df):
     X = df[['Days']]
     y = df['Close']
+
+    # Split data: 80% training, 20% testing
     train_size = int(0.8 * len(df))
+
     X_train = X[:train_size]
     y_train = y[:train_size]
 
-    # Train the model
+    X_test = X[train_size:]
+    y_test = y[train_size:]
+
+    # Create polynomial regression model
     model = make_pipeline(PolynomialFeatures(3), LinearRegression())
+
+    # Train model
     model.fit(X_train, y_train)
 
-    # Save the trained model to a pickle file
+    # Predict on test data
+    predictions = model.predict(X_test)
+
+    # Evaluate model
+    mse = mean_squared_error(y_test, predictions)
+    rmse = np.sqrt(mse)
+    r2 = r2_score(y_test, predictions)
+
+    print("Model Evaluation:")
+    print("RMSE:", rmse)
+    print("R² Score:", r2)
+
+    # Save model
     with open("gold_price_model.pkl", "wb") as file:
         pickle.dump(model, file)
-    print("Model trained and saved as gold_price_model.pkl")
 
     return model
 
