@@ -1,5 +1,8 @@
 myenv/
+.venv/
 __pycache__/
 *.pyc
 .mpl_config/
+.yfinance_cache/
 .env
+future_staragey.py
